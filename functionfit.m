@@ -1,48 +1,59 @@
 clear all;
 close all;
 
+
 %% setup
 
 % training data
 
-a = -4 * pi;
-b = 4 * pi;
-nsamp = 10000;
+n_samp = 100; % number of samples; play around with this
 
-rx = a + ((b - a) .* rand(nsamp, 1));
-ry = func(rx) + (0.2 .* randn(nsamp, 1));
+a = -1; % lower bound of training range
+b = 1; % upper bound of training range
+
+noise_coeff = 0; % the default was 0.2; 0 means noise has been removed completely
+
+x_train = a + ((b - a) .* rand(n_samp, 1));
+y_train = func(x_train) + (noise_coeff .* randn(n_samp, 1));
 
 figure('Name', 'Regression Network', 'NumberTitle', 'off'); hold on;
-plot(rx, ry, 'mx', 'linewidth', 1);
+plot(x_train, y_train, 'mx', 'linewidth', 1);
 
 
 % underlying function
 
-x = a : pi/8 : b;
-xextrap = [(round(2 * a) : pi/8 : a) x (b : pi/8 : round(2 * b))];
-y = func(xextrap);
+step = 0.05;
+extrap_coeff = 3;
 
-plot(xextrap, y, 'k--', 'linewidth', 2);
+x = (extrap_coeff * a) : step : (extrap_coeff * b);
+y = func(x);
+
+plot(x, y, 'k--', 'linewidth', 2);
 legend('training data', 'underlying function');
 
 
 %% neural network creation and training
 
-netconf = [10]; % simple nnet: 1 layer, 10 neurons
-%netconf = [40 30 20 10 5 3]; % complex nnet: 6 layers, varying #s of neurons
+% play around with these
+net_conf = [3]; % simple neural net
+%net_conf = [40 30 20 10 5 3]; % complex neural net
 
-% overfitting gets worse the more complex the network is;
-% one approach to deal with overtraining is to create an ensemble model
-% (average many nnets together)
+net = feedforwardnet(net_conf);
 
-net = feedforwardnet(netconf);
-net = train(net, rx.', ry.');
+% training algorithms
+net.trainFcn = 'trainbr'; % best
+%net.trainFcn = 'trainlm'; % pretty bad (default)
+%net.trainFcn = 'trainscg'; % worst
+
+net = train(net, x_train.', y_train.');
 
 
 % network output (with extrapolation)
 
-ypred = net(xextrap);
+y_pred = net(x);
 
-plot(xextrap, ypred, 'g', 'linewidth', 2);
+plot(x, y_pred, 'g', 'linewidth', 2);
 legend('training data', 'underlying function', 'network output');
+
+perf = perform(net, y, y_pred) % network performance
 
