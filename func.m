@@ -1,6 +1,6 @@
 function y = func(x)
     
-    y = x; % linear
+    %y = x; % linear
     
     %y = exp(x); % exponential
     
@@ -10,7 +10,7 @@ function y = func(x)
     
     %y = mod(x, 2); % modulus
     
-    %y = sin(4 * pi * x); % trigonometric
+    y = sin(4 * pi * x); % trigonometric
     
 end
 
