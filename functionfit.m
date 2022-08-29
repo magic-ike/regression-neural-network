@@ -6,12 +6,14 @@ close all;
 
 % training data
 
-n_samp = 100; % number of samples
+n_samp = 100; % 100 samples
+%n_samp = 10000; % 10,000 samples
 
 a = -1; % lower bound of training range
 b = 1; % upper bound of training range
 
-noise_coeff = 0.2; % 0 means noise has been removed completely
+noise_coeff = 0.2;
+%noise_coeff = 0; % noise has been completely removed
 
 x_train = a + ((b - a) .* rand(n_samp, 1));
 y_train = func(x_train) + (noise_coeff .* randn(n_samp, 1));
